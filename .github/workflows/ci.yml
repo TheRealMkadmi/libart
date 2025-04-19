@@ -1,0 +1,67 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }} / ${{ matrix.type }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        type: [static, shared]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+
+      - name: Configure CMake
+        run: >
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_STATIC_LIBS=${{ matrix.type == 'static' && 'ON' || 'OFF' }}
+          -DBUILD_SHARED_LIBS=${{ matrix.type == 'shared' && 'ON' || 'OFF' }}
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Install
+        run: cmake --install build --prefix package --config Release
+      - name: Run tests
+        if: matrix.type == 'shared'
+        run: |
+          cd build
+          ctest --output-on-failure -C Release
+
+      - name: Upload libraries
+        uses: actions/upload-artifact@v3
+        with:
+          name: libart-${{ matrix.os }}-${{ matrix.type }}
+          path: |
+            package/lib/**
+            package/bin/**
+
+  release:
+    name: Release Artifacts
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.sha }}
+          name: Release ${{ github.sha }}
+          files: |
+            artifacts/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

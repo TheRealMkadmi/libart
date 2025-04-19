@@ -3,52 +3,65 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <check.h>
-
+#include <stdint.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
 #include "art.h"
 
-START_TEST(test_art_init_and_destroy)
-{
+// CMocka assert macros require a message argument in C.
+// Provide a default message for all assertions for portability.
+
+
+#ifdef fail_unless
+#undef fail_unless
+#endif
+#define fail_unless(cond, ...) assert_true(cond)
+
+
+static void test_art_init_and_destroy(void **state) {
+    (void)state;
     art_tree t;
     int res = art_tree_init(&t);
-    fail_unless(res == 0);
+    assert_int_equal(res, 0);
 
-    fail_unless(art_size(&t) == 0);
+    assert_int_equal(art_size(&t), 0);
 
     res = art_tree_destroy(&t);
-    fail_unless(res == 0);
+    assert_int_equal(res, 0);
 }
-END_TEST
 
-START_TEST(test_art_insert)
-{
+static void test_art_insert(void **state) {
+    (void)state;
     art_tree t;
     int res = art_tree_init(&t);
-    fail_unless(res == 0);
+    assert_int_equal(res, 0);
 
     int len;
     char buf[512];
     FILE *f = fopen("tests/words.txt", "r");
+    assert_non_null(f);
 
     uintptr_t line = 1;
     while (fgets(buf, sizeof buf, f)) {
         len = strlen(buf);
         buf[len-1] = '\0';
-        fail_unless(NULL == art_insert(&t, (unsigned char*)buf, len, (void*)line));
-        fail_unless(art_size(&t) == line);
+        assert_null(art_insert(&t, (unsigned char*)buf, len, (void*)line));
+        assert_int_equal(art_size(&t), line);
         line++;
     }
+    fclose(f);
 
     res = art_tree_destroy(&t);
-    fail_unless(res == 0);
+    assert_int_equal(res, 0);
 }
-END_TEST
 
-START_TEST(test_art_insert_verylong)
-{
+static void test_art_insert_verylong(void **state) {
+    (void)state;
     art_tree t;
     int res = art_tree_init(&t);
-    fail_unless(res == 0);
+    assert_int_equal(res, 0);
 
     unsigned char key1[300] = {16,0,0,0,7,10,0,0,0,2,17,10,0,0,0,120,10,0,0,0,120,10,0,
       0,0,216,10,0,0,0,202,10,0,0,0,194,10,0,0,0,224,10,0,0,0,
@@ -88,18 +101,16 @@ START_TEST(test_art_insert_verylong)
       44,208,250,180,14,1,0,0,8, '\0'};
 
 
-    fail_unless(NULL == art_insert(&t, key1, 299, (void*)key1));
-    fail_unless(NULL == art_insert(&t, key2, 302, (void*)key2));
+    assert_null(art_insert(&t, key1, 299, (void*)key1));
+    assert_null(art_insert(&t, key2, 302, (void*)key2));
     art_insert(&t, key2, 302, (void*)key2);
-    fail_unless(art_size(&t) == 2);
+    assert_int_equal(art_size(&t), 2);
 
     res = art_tree_destroy(&t);
-    fail_unless(res == 0);
+    assert_int_equal(res, 0);
 }
-END_TEST
 
-START_TEST(test_art_insert_search)
-{
+static void test_art_insert_search(void **state) {
     art_tree t;
     int res = art_tree_init(&t);
     fail_unless(res == 0);
@@ -143,10 +154,7 @@ START_TEST(test_art_insert_search)
     res = art_tree_destroy(&t);
     fail_unless(res == 0);
 }
-END_TEST
-
-START_TEST(test_art_insert_delete)
-{
+static void test_art_insert_delete(void **state) {
     art_tree t;
     int res = art_tree_init(&t);
     fail_unless(res == 0);
@@ -198,10 +206,7 @@ START_TEST(test_art_insert_delete)
     res = art_tree_destroy(&t);
     fail_unless(res == 0);
 }
-END_TEST
-
-START_TEST(test_art_insert_random_delete)
-{
+static void test_art_insert_random_delete(void **state) {
     art_tree t;
     int res = art_tree_init(&t);
     fail_unless(res == 0);
@@ -240,8 +245,6 @@ START_TEST(test_art_insert_random_delete)
     res = art_tree_destroy(&t);
     fail_unless(res == 0);
 }
-END_TEST
-
 int iter_cb(void *data, const unsigned char* key, uint32_t key_len, void *val) {
     uint64_t *out = (uint64_t*)data;
     uintptr_t line = (uintptr_t)val;
@@ -251,8 +254,7 @@ int iter_cb(void *data, const unsigned char* key, uint32_t key_len, void *val) {
     return 0;
 }
 
-START_TEST(test_art_insert_iter)
-{
+static void test_art_insert_iter(void **state) {
     art_tree t;
     int res = art_tree_init(&t);
     fail_unless(res == 0);
@@ -283,8 +285,6 @@ START_TEST(test_art_insert_iter)
     res = art_tree_destroy(&t);
     fail_unless(res == 0);
 }
-END_TEST
-
 typedef struct {
     int count;
     int max_count;
@@ -301,8 +301,7 @@ static int test_prefix_cb(void *data, const unsigned char *k, uint32_t k_len, vo
     return 0;
 }
 
-START_TEST(test_art_iter_prefix)
-{
+static void test_art_iter_prefix(void **state) {
     art_tree t;
     int res = art_tree_init(&t);
     fail_unless(res == 0);
@@ -367,10 +366,7 @@ START_TEST(test_art_iter_prefix)
     res = art_tree_destroy(&t);
     fail_unless(res == 0);
 }
-END_TEST
-
-START_TEST(test_art_long_prefix)
-{
+static void test_art_long_prefix(void **state) {
     art_tree t;
     int res = art_tree_init(&t);
     fail_unless(res == 0);
@@ -413,10 +409,7 @@ START_TEST(test_art_long_prefix)
     res = art_tree_destroy(&t);
     fail_unless(res == 0);
 }
-END_TEST
-
-START_TEST(test_art_insert_search_uuid)
-{
+static void test_art_insert_search_uuid(void **state) {
     art_tree t;
     int res = art_tree_init(&t);
     fail_unless(res == 0);
@@ -460,10 +453,7 @@ START_TEST(test_art_insert_search_uuid)
     res = art_tree_destroy(&t);
     fail_unless(res == 0);
 }
-END_TEST
-
-START_TEST(test_art_max_prefix_len_scan_prefix)
-{
+static void test_art_max_prefix_len_scan_prefix(void **state) {
     art_tree t;
     int res = art_tree_init(&t);
     fail_unless(res == 0);
@@ -489,4 +479,3 @@ START_TEST(test_art_max_prefix_len_scan_prefix)
     res = art_tree_destroy(&t);
     fail_unless(res == 0);
 }
-END_TEST

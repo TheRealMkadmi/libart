@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 #include <stdio.h>
 #include <assert.h>
 #include "art.h"
@@ -152,7 +151,6 @@ static art_node** find_child(art_node *n, unsigned char c) {
             }
             break;
 
-        {
         case NODE16:
             p.p2 = (art_node16*)n;
 
@@ -198,7 +196,6 @@ static art_node** find_child(art_node *n, unsigned char c) {
             if (bitfield)
                 return &p.p2->children[__builtin_ctz(bitfield)];
             break;
-        }
 
         case NODE48:
             p.p3 = (art_node48*)n;
@@ -220,7 +217,10 @@ static art_node** find_child(art_node *n, unsigned char c) {
 }
 
 // Simple inlined if
-static inline int min(int a, int b) {
+#ifdef min
+#undef min
+#endif
+static int min(int a, int b) {
     return (a < b) ? a : b;
 }
 
@@ -938,7 +938,8 @@ int art_iter_prefix(art_tree *t, const unsigned char *key, int key_len, art_call
 
         // If the depth matches the prefix, we need to handle this node
         if (depth == key_len) {
-            art_leaf *l = minimum(n);
+            art_leaf *l;
+            l = minimum(n);
             if (!leaf_prefix_matches(l, key, key_len))
                return recursive_iter(n, cb, data);
             return 0;
