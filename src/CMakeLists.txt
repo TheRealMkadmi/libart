@@ -23,4 +23,10 @@ if(BUILD_STATIC_LIBS)
         RUNTIME DESTINATION bin)
 endif()
 
+if(TARGET art_shared)
+    add_library(art ALIAS art_shared)
+elseif(TARGET art_static)
+    add_library(art ALIAS art_static)
+endif()
+
 install(FILES ${ART_HEADERS} DESTINATION include/libart)
