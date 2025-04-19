@@ -38,7 +38,7 @@ jobs:
           ctest --output-on-failure -C Release
 
       - name: Upload libraries
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: libart-${{ matrix.os }}-${{ matrix.type }}
           path: |
