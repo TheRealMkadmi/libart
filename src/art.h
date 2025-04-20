@@ -14,14 +14,10 @@
 #ifndef ART_H
 #define ART_H
 
-#if defined(_WIN32)
-#  ifdef art_shared_EXPORTS
-#    define ART_API __declspec(dllexport)
-#  else
-#    define ART_API __declspec(dllimport)
-#  endif
+#if defined(_WIN32) && defined(art_shared_EXPORTS)
+  #define ART_API __declspec(dllexport)
 #else
-#  define ART_API
+  #define ART_API
 #endif
 
 #ifdef __cplusplus
