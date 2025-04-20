@@ -14,6 +14,16 @@
 #ifndef ART_H
 #define ART_H
 
+#if defined(_WIN32)
+#  ifdef art_shared_EXPORTS
+#    define ART_API __declspec(dllexport)
+#  else
+#    define ART_API __declspec(dllimport)
+#  endif
+#else
+#  define ART_API
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -107,7 +117,7 @@ typedef struct {
  * Initializes an ART tree
  * @return 0 on success.
  */
-int art_tree_init(art_tree *t);
+ART_API int art_tree_init(art_tree *t);
 
 /**
  * DEPRECATED
@@ -120,7 +130,7 @@ int art_tree_init(art_tree *t);
  * Destroys an ART tree
  * @return 0 on success.
  */
-int art_tree_destroy(art_tree *t);
+ART_API int art_tree_destroy(art_tree *t);
 
 /**
  * DEPRECATED
@@ -135,7 +145,7 @@ int art_tree_destroy(art_tree *t);
 #ifdef BROKEN_GCC_C99_INLINE
 # define art_size(t) ((t)->size)
 #else
-inline uint64_t art_size(art_tree *t) {
+ART_API inline uint64_t art_size(art_tree *t) {
     return t->size;
 }
 #endif
@@ -149,7 +159,7 @@ inline uint64_t art_size(art_tree *t) {
  * @return null if the item was newly inserted, otherwise
  * the old value pointer is returned.
  */
-void* art_insert(art_tree *t, const unsigned char *key, int key_len, void *value);
+ART_API void* art_insert(art_tree *t, const unsigned char *key, int key_len, void *value);
 
 /**
  * inserts a new value into the art tree (not replacing)
@@ -160,7 +170,7 @@ void* art_insert(art_tree *t, const unsigned char *key, int key_len, void *value
  * @return null if the item was newly inserted, otherwise
  * the old value pointer is returned.
  */
-void* art_insert_no_replace(art_tree *t, const unsigned char *key, int key_len, void *value);
+ART_API void* art_insert_no_replace(art_tree *t, const unsigned char *key, int key_len, void *value);
 
 /**
  * Deletes a value from the ART tree
@@ -170,7 +180,7 @@ void* art_insert_no_replace(art_tree *t, const unsigned char *key, int key_len, 
  * @return NULL if the item was not found, otherwise
  * the value pointer is returned.
  */
-void* art_delete(art_tree *t, const unsigned char *key, int key_len);
+ART_API void* art_delete(art_tree *t, const unsigned char *key, int key_len);
 
 /**
  * Searches for a value in the ART tree
@@ -180,19 +190,19 @@ void* art_delete(art_tree *t, const unsigned char *key, int key_len);
  * @return NULL if the item was not found, otherwise
  * the value pointer is returned.
  */
-void* art_search(const art_tree *t, const unsigned char *key, int key_len);
+ART_API void* art_search(const art_tree *t, const unsigned char *key, int key_len);
 
 /**
  * Returns the minimum valued leaf
  * @return The minimum leaf or NULL
  */
-art_leaf* art_minimum(art_tree *t);
+ART_API art_leaf* art_minimum(art_tree *t);
 
 /**
  * Returns the maximum valued leaf
  * @return The maximum leaf or NULL
  */
-art_leaf* art_maximum(art_tree *t);
+ART_API art_leaf* art_maximum(art_tree *t);
 
 /**
  * Iterates through the entries pairs in the map,
@@ -204,7 +214,7 @@ art_leaf* art_maximum(art_tree *t);
  * @arg data Opaque handle passed to the callback
  * @return 0 on success, or the return of the callback.
  */
-int art_iter(art_tree *t, art_callback cb, void *data);
+ART_API int art_iter(art_tree *t, art_callback cb, void *data);
 
 /**
  * Iterates through the entries pairs in the map,
@@ -218,7 +228,7 @@ int art_iter(art_tree *t, art_callback cb, void *data);
  * @arg data Opaque handle passed to the callback
  * @return 0 on success, or the return of the callback.
  */
-int art_iter_prefix(art_tree *t, const unsigned char *prefix, int prefix_len, art_callback cb, void *data);
+ART_API int art_iter_prefix(art_tree *t, const unsigned char *prefix, int prefix_len, art_callback cb, void *data);
 
 #ifdef __cplusplus
 }

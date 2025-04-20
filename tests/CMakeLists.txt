@@ -8,7 +8,7 @@ set(TEST_SOURCES
 
 add_executable(test_art ${TEST_SOURCES})
 
-# Link to the shared library and cmocka
+# Link to the library (alias 'art' resolves to shared or static) and cmocka
 target_link_libraries(test_art PRIVATE art cmocka)
 
 target_include_directories(test_art PRIVATE
