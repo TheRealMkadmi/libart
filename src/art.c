@@ -194,7 +194,7 @@ static art_node** find_child(art_node *n, unsigned char c) {
              * the index.
              */
             if (bitfield)
-                return &p.p2->children[__builtin_ctz(bitfield)];
+                return &p.p2->children[ctz32(bitfield)];
             break;
 
         case NODE48:
@@ -447,7 +447,7 @@ static void add_child16(art_node16 *n, art_node **ref, unsigned char c, void *ch
         // Check if less than any
         unsigned idx;
         if (bitfield) {
-            idx = __builtin_ctz(bitfield);
+            idx = ctz32(bitfield);
             memmove(n->keys+idx+1,n->keys+idx,n->n.num_children-idx);
             memmove(n->children+idx+1,n->children+idx,
                     (n->n.num_children-idx)*sizeof(void*));

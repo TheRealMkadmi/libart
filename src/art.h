@@ -1,4 +1,16 @@
 #include <stdint.h>
+#if defined(_MSC_VER)
+  #include <intrin.h>
+  static inline unsigned int ctz32(unsigned int x) {
+    unsigned long index;
+    _BitScanForward(&index, x);
+    return (unsigned int)index;
+  }
+#else
+  static inline unsigned int ctz32(unsigned int x) {
+    return __builtin_ctz(x);
+  }
+#endif
 #ifndef ART_H
 #define ART_H
 
