@@ -1,5 +1,10 @@
-# Add the CMocka submodule
-add_subdirectory(${CMAKE_SOURCE_DIR}/external/cmocka external/cmocka_build)
+include(FetchContent)
+FetchContent_Declare(
+  cmocka
+  GIT_REPOSITORY https://git.cryptomilk.org/projects/cmocka.git
+  GIT_TAG        v1.1.5
+)
+FetchContent_MakeAvailable(cmocka)
 
 # Test sources
 set(TEST_SOURCES

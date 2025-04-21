@@ -42,7 +42,6 @@ jobs:
       - name: Build all targets with ccache
         run: |
           for tgt in linux-x64 linux-arm64 linux-arm win-x64 win-x86; do
-            
             for mode in shared static; do
               args="-DBUILD_SHARED_LIBS=$([ $mode = shared ] && echo ON || echo OFF)"
               cmake -S . -B build-$tgt-$mode \
@@ -50,7 +49,7 @@ jobs:
                 $args \
                 -DCMAKE_C_COMPILER_LAUNCHER=ccache \
                 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-                $( [[ $tgt == win* ]] && echo "-DCMAKE_SYSTEM_NAME=Windows -DCMAKE_TOOLCHAIN_FILE=/usr/share/mingw-w64/toolchain-${tgt
+                $( [[ $tgt == win* ]] && echo "-DCMAKE_SYSTEM_NAME=Windows -DCMAKE_TOOLCHAIN_FILE=/usr/share/mingw-w64/toolchain-${tgt}" ) \
               cmake --build build-$tgt-$mode --config Release -- -j$(nproc)
             done
           done                                                    
