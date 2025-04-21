@@ -2,7 +2,8 @@ name: Build & Release libart
 
 on:
   push:
-    tags: ['v*']
+    branches:
+      - master
 
 jobs:
   build-and-package-linux:
