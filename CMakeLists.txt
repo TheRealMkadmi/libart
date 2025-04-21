@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(libart C)
+include(CTest)
 
 # Uniform output directories for all build configurations
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/$<CONFIG>)
