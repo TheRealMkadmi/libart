@@ -32,7 +32,9 @@ jobs:
             gcc-aarch64-linux-gnu \
             gcc-arm-linux-gnueabi \
             ccache \
-            zip                                              
+            zip \
+            libcmocka-dev \
+            libcmocka0
 
       - name: Setup CMake
         uses: jwlawson/actions-setup-cmake@v2                    
@@ -92,7 +94,8 @@ jobs:
             ${{ runner.os }}-ccache-
 
       - name: Install ccache
-        run: brew install ccache                                 
+        run: |
+          brew install ccache cmocka zip
 
       - name: Setup CMake
         uses: jwlawson/actions-setup-cmake@v2
@@ -106,7 +109,7 @@ jobs:
             -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-          cmake --build build-macos --target all test -j$(sysctl -n hw.ncpu)
+          cmake --build build-macos --target all test -- -j$(sysctl -n hw.ncpu)
 
       - name: Package macOS artifacts
         run: |
