@@ -5,3 +5,4 @@ test_runner
 src/libart.so
 external/
 build/
+build-*/
