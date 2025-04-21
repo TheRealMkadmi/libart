@@ -1,12 +1,3 @@
-include(FetchContent)
-FetchContent_Declare(
-  cmocka
-  GIT_REPOSITORY https://git.cryptomilk.org/projects/cmocka.git
-  GIT_TAG        v1.1.5
-)
-FetchContent_MakeAvailable(cmocka)
-
-# Test sources
 set(TEST_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/runner.c
 )
